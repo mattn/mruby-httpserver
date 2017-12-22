@@ -14,7 +14,7 @@
  'png'  => 'image/png',
  'gif'  => 'image/gif',
 }
-@filedir = '.'
+@filedir = 'static'
 @logger = Logger.new STDERR
 
 def read_file(name)
