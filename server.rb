@@ -16,8 +16,8 @@
  'js'   => 'application/javascript',
  'json' => 'application/json',
 }
-@filedir = 'static'
-@logger = Logger.new STDERR
+@filedir = (ENV['STATICDIR'] || 'static')
+@logger = Logger.new (ENV['LOGFILE'] || STDERR)
 
 def read_file(name)
   File.open(name, 'rb') do |f|
@@ -35,7 +35,7 @@ def handle_request(s)
     n = nil
     while true
       payload += s.gets
-      n = payload.index /\r?\n\r?\n/
+      n = payload.index(/\r?\n\r?\n/)
       break unless n.nil?
     end
     unless n.nil?
@@ -56,13 +56,13 @@ def handle_request(s)
   path = phr.path.gsub('\+',' ').gsub(/%([A-Fa-f0-9][A-Fa-f0-9])/) { [$1.hex].pack('C') }
   path = path + (phr.path[-1] == '/' ? 'index.html' : '')
   path.gsub!('\\', '_')
-  ct = @ctmap[path.split(".")[-1]] || 'application/octet-stream'
+  ct = @ctmap[path.split('.')[-1]] || 'application/octet-stream'
 
   item = @cache[path]
-  now = Time.now.to_i
-  if item && item[:epoch] >= now - 5
+  epoch = Time.now.to_i
+  if item && item[:epoch] >= epoch - 5
     body = item[:body]
-    @cache[path][:epoch] = now
+    @cache[path][:epoch] = epoch
   else
     begin
       body = read_file(@filedir + path)
@@ -71,7 +71,7 @@ def handle_request(s)
       s.close
       return false
     end
-    @cache[path] = {:body => body, :epoch => now}
+    @cache[path] = {:body => body, :epoch => epoch}
   end
   n = phr.headers.index {|x| x[0] == 'connection'}
   keepalive = true || n.nil? || phr.headers[n][1].downcase != 'keep-alive'
@@ -86,8 +86,9 @@ def handle_request(s)
   true
 end
 
-port = 
-server = TCPServer.open(host = '0.0.0.0', service = (ENV['PORT'] || '8001').to_i)
+port = (ENV['PORT'] || '8001').to_i
+@logger.info "server listening :#{port}"
+server = TCPServer.open(host = '0.0.0.0', service = port)
 n = 0
 while true
   s = server.accept
