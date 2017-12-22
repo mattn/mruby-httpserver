@@ -39,6 +39,8 @@ def handle_request(s)
     unless n.nil?
       payload, post = payload[0..n+3], payload[n+4..-1]
     end
+  elsif !is_post
+    payload.gsub!(/\r?\n$/, " HTTP/1.0\r\n\r\n")
   end
   phr = Phr.new
   offset = phr.parse_request payload
