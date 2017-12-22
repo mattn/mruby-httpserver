@@ -49,7 +49,9 @@ def handle_request(s)
     l = n.nil? ? 0 : phr.headers[n][1].to_i
     post += l > 0 ? s.read(l) : s.read
   end
-  path = phr.path + (phr.path[-1] == '/' ? 'index.html' : '')
+  path = phr.path.gsub('\+',' ').gsub(/%([A-Fa-f0-9][A-Fa-f0-9])/) { [$1.hex].pack('C') }
+  path = path + (phr.path[-1] == '/' ? 'index.html' : '')
+  path.gsub!('\\', '_')
   ct = @ctmap[path.split(".")[-1]] || 'application/octet-stream'
 
   item = @cache[path]
