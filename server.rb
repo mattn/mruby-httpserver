@@ -13,6 +13,8 @@
  'jpg'  => 'image/jpeg',
  'png'  => 'image/png',
  'gif'  => 'image/gif',
+ 'js'   => 'application/javascript',
+ 'json' => 'application/json',
 }
 @filedir = 'static'
 @logger = Logger.new STDERR
