@@ -1,0 +1,9 @@
+pre {
+  background-color: #eee;
+}
+
+#logo {
+  position: fixed;
+  display: none;
+  overflow: hidden;
+}

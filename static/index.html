@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>mruby-httpserver</title>
+	<link rel="stylesheet" type="text/css" href="style.css" media="all">
+	<script src="app.js"></script>
+</head>
+<body>
+  <h1>mruby-httpserver</h1>
+  <p>This is HTTP server written in <a href="https://github.com/mruby/mruby">mruby</a></p>
+
+<pre><code>
+conf.gem 'mrbgems/mruby-io'
+conf.gem 'mrbgems/mruby-socket'
+
+conf.gem :github =&gt; 'mattn/mruby-onig-regexp'
+conf.gem :github =&gt; 'Asmod4n/mruby-phr'
+conf.gem :github =&gt; 'iij/mruby-env'
+conf.gem :github =&gt; 'katzer/mruby-logger'
+
+</code></pre>
+  <img id="logo" src="logo.png" alt="はろー">
+</body>
+</html>
