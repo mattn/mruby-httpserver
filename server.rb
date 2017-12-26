@@ -84,7 +84,7 @@ def handle_request(s)
   return false
 end
 
-port = (ENV['PORT'] || '8001').to_i
+port = (ENV['PORT'] || '5000').to_i
 @logger.info "server listening :#{port}"
 server = TCPServer.open(host = '0.0.0.0', service = port)
 server.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
