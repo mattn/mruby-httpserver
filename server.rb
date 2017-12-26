@@ -74,26 +74,25 @@ def handle_request(s)
     @cache[path] = {:body => body, :epoch => epoch}
   end
   n = phr.headers.index {|x| x[0] == 'connection'}
-  keepalive = true || n.nil? || phr.headers[n][1].downcase != 'keep-alive'
-  phr.reset
-  # TODO handle multiple requset
+  keepalive = n && phr.headers[n][1].downcase == 'keep-alive'
   if keepalive
-    s.write "HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Type: #{ct}\r\nContent-Length: #{body.size}\r\n\r\n#{body}"
-    s.close
-    return false
+    s.write "HTTP/1.1 200 OK\r\nConnection: keep-alive\r\nContent-Type: #{ct}\r\nContent-Length: #{body.size}\r\n\r\n#{body}\n"
+    return true
   end
-  s.write "HTTP/1.1 200 OK\r\nConnection: keep-alive\r\nContent-Type: #{ct}\r\nContent-Length: #{body.size}\r\n\r\n#{body}"
-  true
+  s.write "HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Type: #{ct}\r\nContent-Length: #{body.size}\r\n\r\n#{body}\n"
+  s.close
+  return false
 end
 
 port = (ENV['PORT'] || '8001').to_i
 @logger.info "server listening :#{port}"
 server = TCPServer.open(host = '0.0.0.0', service = port)
-n = 0
+server.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
 while true
   s = server.accept
   begin
-    handle_request(s)
+    s.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
+    while handle_request(s); end
   rescue => e
     p e
   ensure
