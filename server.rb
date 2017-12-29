@@ -19,12 +19,6 @@
 @filedir = (ENV['STATICDIR'] || 'static')
 @logger = Logger.new (ENV['LOGFILE'] || STDERR)
 
-def read_file(name)
-  File.open(name, 'rb') do |f|
-    f.read(File.size(name))
-  end
-end
-
 def handle_request(s)
   payload = s.gets rescue nil
   return false unless payload
@@ -65,7 +59,7 @@ def handle_request(s)
     @cache[path][:epoch] = epoch
   else
     begin
-      body = read_file(@filedir + path)
+      body = IO.read(@filedir + name)
     rescue
       s.write "HTTP/1.1 404 Not Found\r\nConnection: close\r\n\r\nNot Found"
       s.close
