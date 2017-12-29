@@ -86,7 +86,9 @@ while true
   s = server.accept
   begin
     s.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
-    while handle_request(s); end
+    while handle_request(s);
+      GC.start
+    end
   rescue => e
     p e
   ensure
